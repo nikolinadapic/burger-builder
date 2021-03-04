@@ -26,10 +26,10 @@ export const purchaseBurgerStart = () => {
 };
 
 //async action creator
-export const purchaseBurger = (orderData) => {
+export const purchaseBurger = (orderData, token) => {
     return dispatch => {
         dispatch(purchaseBurgerStart()); //akcija koja je vracena od purchaseBurgerStart je dispatchana u store
-        axios.post('/orders.json', orderData) //.json je radi Firebasea koji koristim
+        axios.post('/orders.json?auth=' + token, orderData) //.json je radi Firebasea koji koristim
             .then(response => {
                 console.log(response.data);
                 dispatch(purchaseBurgerSuccess(response.data.name, orderData));
@@ -68,10 +68,11 @@ export const fetchOrdersStart = () => {
 };
 
 //za async code
-export const fetchOrders = () => {
+export const fetchOrders = (token, userId) => {
     return dispatch => {
         dispatch(fetchOrdersStart());
-        axios.get('/orders.json')
+        const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
+        axios.get('/orders.json' + queryParams)
             .then(res => {
                 //console.log(res);
                 const fetchedOrders = [];
