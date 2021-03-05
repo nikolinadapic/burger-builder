@@ -8,6 +8,7 @@ import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../../axios-orders';
 import classes from './ContactData.module.css';
 import * as actions from '../../../store/actions/index';
+import { updateObject , checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
     state = {
@@ -116,54 +117,19 @@ class ContactData extends Component {
         this.props.onOrderBurger(order, this.props.token);
     }
 
-    checkValidity = (value, rules) => {
-        let isValid = true;
-        if (!rules) {
-            return true;
-        }
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid; //true or false
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid;
-    }
-
     inputChangedHandler = (event, inputIdentifier) => {
         //console.log(event.target.value);
-        const updatedOrderForm = {
-            ...this.state.orderForm //nested objects (such as name, elementConfig etc.) are not cloned deeply, just their pointer is copied
-        };
+        //nested objects (such as name, elementConfig etc.) are not cloned deeply, just their pointer is copied
 
         //now the goal is to deeply clone (with spread operator), in order to get to value property inside each nested object
-        const updatedFormElement = {
-            ...updatedOrderForm[inputIdentifier] //inputIdentifier = name, street, country...
-        };
-
-        updatedFormElement.value = event.target.value;
-
-        updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
-        updatedFormElement.touched = true;
-
-        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], { //inputIdentifier = name, street, country...
+            value: event.target.value,
+            valid: checkValidity(event.target.value, this.state.orderForm[inputIdentifier].validation),
+            touched: true
+        });
+        const updatedOrderForm = updateObject(this.state.orderForm, {
+            [inputIdentifier]: updatedFormElement
+        })
 
         let formIsValid = true;
         for (let inputIdentifier in updatedOrderForm) {

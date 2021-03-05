@@ -31,7 +31,6 @@ export const purchaseBurger = (orderData, token) => {
         dispatch(purchaseBurgerStart()); //akcija koja je vracena od purchaseBurgerStart je dispatchana u store
         axios.post('/orders.json?auth=' + token, orderData) //.json je radi Firebasea koji koristim
             .then(response => {
-                console.log(response.data);
                 dispatch(purchaseBurgerSuccess(response.data.name, orderData));
             })
             .catch(error => {
