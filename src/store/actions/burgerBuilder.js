@@ -1,6 +1,5 @@
 //will hold action creators for building a burger (sync actions for adding and removing ingredients)
 import * as actionTypes from './actionTypes';
-import axios from '../../axios-orders';
 
 export const addIngredient = (name) => {
     return {
@@ -30,13 +29,7 @@ export const fetchIngredientsFailed = () => {
 };
 
 export const initIngredients = () => {
-    return dispatch => {
-        axios.get('https://react-burger-builder-65b06-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json')
-            .then(response => {
-                dispatch(setIngredients(response.data));
-            })
-            .catch(error => {
-                dispatch(fetchIngredientsFailed());
-            });
+    return {
+        type: actionTypes.INIT_INGREDIENTS
     };
 };

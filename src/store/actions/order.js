@@ -1,7 +1,6 @@
 //will hold the action creators for submitting an order
 
 import * as actionTypes from './actionTypes';
-import axios from '../../axios-orders';
 
 //we want to export some handlers here (actions creators)
 export const purchaseBurgerSuccess = (id, orderData) => {
@@ -27,16 +26,10 @@ export const purchaseBurgerStart = () => {
 
 //async action creator
 export const purchaseBurger = (orderData, token) => {
-    return dispatch => {
-        dispatch(purchaseBurgerStart()); //akcija koja je vracena od purchaseBurgerStart je dispatchana u store
-        axios.post('/orders.json?auth=' + token, orderData) //.json je radi Firebasea koji koristim
-            .then(response => {
-                dispatch(purchaseBurgerSuccess(response.data.name, orderData));
-            })
-            .catch(error => {
-                dispatch(purchaseBurgerFail(error));
-                //console.log(error)
-            });
+    return {
+        type: actionTypes.PURCHASE_BURGER,
+        orderData: orderData,
+        token: token        
     };
 };
 
@@ -68,20 +61,9 @@ export const fetchOrdersStart = () => {
 
 //za async code
 export const fetchOrders = (token, userId) => {
-    return dispatch => {
-        dispatch(fetchOrdersStart());
-        const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
-        axios.get('/orders.json' + queryParams)
-            .then(res => {
-                //console.log(res);
-                const fetchedOrders = [];
-                for (let key in res.data) {
-                    fetchedOrders.push({...res.data[key], id: key});
-                }
-                dispatch(fetchOrdersSuccess(fetchedOrders));
-            })
-            .catch(err => {
-                dispatch(fetchOrdersFail(err));
-            });
+    return {
+        type: actionTypes.FETCH_ORDERS,
+        token: token,
+        userId: userId
     };
 };
